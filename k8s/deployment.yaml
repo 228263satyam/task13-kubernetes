@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cifar10-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cifar10-api
+  template:
+    metadata:
+      labels:
+        app: cifar10-api
+    spec:
+      containers:
+        - name: cifar10-api
+          image: cifar10-api:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
